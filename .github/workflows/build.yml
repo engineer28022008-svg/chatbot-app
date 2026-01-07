@@ -1,21 +1,26 @@
 name: Build APK
 
-on:
-  push:
+on: [push]
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build APK with Buildozer
-        uses: digreatbrian/buildozer-action@v2
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
-          python-version: "3.10.12"
-          buildozer-cmd: buildozer android debug
+          python-version: '3.11'  # make sure it's in quotes
+
+      - name: Install Buildozer
+        run: |
+          pip install --upgrade pip
+          pip install buildozer
+
+      - name: Build APK with Buildozer
+        run: buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

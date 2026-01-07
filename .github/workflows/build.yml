@@ -1,29 +1,39 @@
 name: Build APK
 
-on: [push]
+on:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    - name: Checkout Repository
+      uses: actions/checkout@v3
 
-      - name: Setup Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'  # make sure it's in quotes
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'  # choose the Python version you need
 
-      - name: Install Buildozer
-        run: |
-          pip install --upgrade pip
-          pip install buildozer
+    - name: Install Buildozer
+      run: pip install --upgrade buildozer
 
-      - name: Build APK with Buildozer
-        run: buildozer android debug
+    - name: Install Cython
+      run: pip install cython
 
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: apk
-          path: bin/*.apk
+    - name: Install Requirements
+      run: |
+        pip install -r requirements.txt || echo "No requirements.txt found"
+
+    - name: Build APK with Buildozer
+      run: buildozer android debug
+
+    - name: Upload APK
+      if: success()
+      uses: actions/upload-artifact@v3
+      with:
+        name: app-debug.apk
+        path: bin/*.apk
